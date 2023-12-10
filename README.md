@@ -13,8 +13,9 @@ This FastAPI server is designed to create and manage diary entries with the inte
 To set up the server locally, follow these steps:
 
 1. ### Clone the Repository
-``` git clone [repository URL] 
-    cd [repository directory] 
+```
+git clone [repository URL] 
+cd [repository directory] 
 ```
 
 2. ### Install Requirements
@@ -24,7 +25,8 @@ To set up the server locally, follow these steps:
 3. ### Set Up Environment Variables
 Create a .env file in the root directory with the following content:
 
-```DB_USER=[your_database_username]
+```
+DB_USER=[your_database_username]
 DB_PASS=[your_database_password]
 DB_HOST=[your_database_host]
 DB_NAME=[your_database_name]
