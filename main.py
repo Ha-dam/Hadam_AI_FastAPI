@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Form
 from pydantic import BaseModel
+import boto3
+from botocore.exceptions import NoCredentialsError
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import sessionmaker,Session, relationship
@@ -20,7 +22,9 @@ DB_NAME = os.getenv("DB_NAME")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 STABLE_DIFFUSION_API_KEY = os.getenv("STABLE_DIFFUSION_API_KEY")
 API_HOST = os.getenv('API_HOST', 'https://api.stability.ai')
-
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 # 데이터베이스 연결 설정
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
@@ -66,14 +70,25 @@ class DiaryRequest(BaseModel):
     experience: str
 
 
+# S3 업로드 함수
+def upload_file_to_s3(file_content, file_name, bucket_name, aws_access_key_id, aws_secret_access_key):
+    
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+    try:
+        s3.put_object(Body=file_content, Bucket=bucket_name, Key=file_name, ContentType='image/png')
+        return f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
+    except NoCredentialsError:
+        raise Exception("AWS credentials are not available")
+    
+
 # 그림 생성을 위한 요약 생성 함수
 def generate_summary(date, location, people, experience):
     summary_instruct = [
         {
             "role": "system",
             "content": "Please generate a sentence using the given parameters that can be used as a title for a diary entry. "
-                       "In 50 letters or less than 50 letters "
-                       f"Date: {date}, Location: {location}, People: {people}, Experience: {experience}"
+                       + "In 50 letters or less than 50 letters "
+                       +f"Date: {date}, Location: {location}, People: {people}, Experience: {experience}"
         }
     ]
 
@@ -95,11 +110,11 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
         {
             "role": "system",
             "content": "You are a program that receives keywords related to time, location, people, and experience to generate diaries. "
-                       "The main information provided will include emotional state scores (comfortable, happy, angry, sad), date, location, and people as basic information, "
-                       "and the user will input text about their experiences that day.\n\nBased on the information provided, please write a diary. "
-                       "The diary will be written in Korean."
-                       "make the content longer and more natural"
-                       "Don't talk about emotion's score"
+                       + "The main information provided will include emotional state scores (comfortable, happy, angry, sad), date, location, and people as basic information, "
+                       + "and the user will input text about their experiences that day.\n\nBased on the information provided, please write a diary. "
+                       + "The diary will be written in Korean."
+                       + "make the content longer and more natural"
+                       + "Don't talk about emotion's score"
         },
         {
             "role": "user",
@@ -139,7 +154,7 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
                     "weight": 1
                 },
                 {
-                    "text": "blurry, bad quality, disfigured, kitsch, ugly, oversaturated, greain, low-res, deformed, violence, gore, blood",
+                    "text": "blurry, bad quality, people, human, disfigured, kitsch, ugly, oversaturated, greain, low-res, deformed, violence, gore, blood",
                     "weight": -1
                 }],
                 "cfg_scale": 7,
@@ -152,22 +167,30 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
 
         if response.status_code != 200:
             raise Exception("Non-200 response from Stable Diffusion API: " + str(response.text))
-
-        # 이미지 데이터 처리: base64형태의 text로 저장, 안드로이드에서 디코딩 필요
-        data = response.json()
-        image_data = base64.b64decode(data["artifacts"][0]["base64"])
-        base64_image = base64.b64encode(image_data).decode()
-
-
-
+        
         # 현재 시간 가져오기
         current_time = datetime.now()
+        timestamp = current_time.strftime("%Y%m%d%H%M%S%f") 
+        
+
+        # 이미지 데이터 S3에 저장후 데이터베이스엔 URL
+        image_data = response.json()["artifacts"][0]["base64"]
+        image_bytes = base64.b64decode(image_data)
+     
+        file_name = f"diary_image_{timestamp}.png" # S3에 저장될 파일 이름
+        image_url = upload_file_to_s3(
+            image_bytes, file_name, S3_BUCKET_NAME,
+            AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+        )
+
+
+
 
         # Diary 인스턴스 생성 및 저장
         new_diary = Diary()
         new_diary.content = content # GPT-3 응답으로부터 생성된 내용
         new_diary.member_id = request.member_id
-        new_diary.img = base64_image
+        new_diary.img = image_url
         new_diary.is_liked =False
         new_diary.created_at = current_time # 생성 시간 설정
         new_diary.modified_at = current_time # 수정 시간 설정
@@ -194,7 +217,7 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(new_diary_info)
         
-        return {"content": content, "diary_id": new_diary.id, "image_data": base64_image}
+        return {"content": content, "diary_id": new_diary.id, "image_data": image_url}
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
@@ -215,11 +238,11 @@ async def recreate_diary(diary_id: int, db: Session = Depends(get_db)):
             {
                 "role": "system",
                 "content": "You are a program that receives keywords related to time, location, people, and experience to generate diaries. "
-                       "The main information provided will include emotional state scores (comfortable, happy, angry, sad), date, location, and people as basic information, "
-                       "and the user will input text about their experiences that day.\n\nBased on the information provided, please write a diary. "
-                       "The diary will be written in Korean."
-                       "make the content longer and more natural"
-                       "Don't talk about emotion's score"
+                       + "The main information provided will include emotional state scores (comfortable, happy, angry, sad), date, location, and people as basic information, "
+                       + "and the user will input text about their experiences that day.\n\nBased on the information provided, please write a diary. "
+                       + "The diary will be written in Korean."
+                       + "make the content longer and more natural"
+                       + "Don't talk about emotion's score"
         
             },
             {
@@ -291,7 +314,7 @@ async def regenerate_diary_image(diary_id: int, db: Session = Depends(get_db)):
                     "weight": 1
                 },
                 {
-                    "text": "blurry, bad quality, disfigured, kitsch, ugly, oversaturated, greain, low-res, deformed, violence, gore, blood",
+                    "text": "blurry, bad quality, disfigured, people, human, kitsch, ugly, oversaturated, greain, low-res, deformed, violence, gore, blood",
                     "weight": -1
                 }],
                 "cfg_scale": 7,
@@ -305,13 +328,21 @@ async def regenerate_diary_image(diary_id: int, db: Session = Depends(get_db)):
         if response.status_code != 200:
             raise Exception("Non-200 response from Stable Diffusion API: " + str(response.text))
 
-        # 이미지 데이터 처리: base64형태의 text로 저장, 안드로이드에서 디코딩 필요
-        data = response.json()
-        image_data = base64.b64decode(data["artifacts"][0]["base64"])
-        base64_image = base64.b64encode(image_data).decode()
+        # 현재 시간 가져오기
+        current_time = datetime.now()
+        timestamp = current_time.strftime("%Y%m%d%H%M%S%f") 
+        
 
+        # 이미지 데이터 S3에 저장후 데이터베이스엔 URL
+        image_data = response.json()["artifacts"][0]["base64"]
+        image_bytes = base64.b64decode(image_data)  # 이미지 데이터를 바이트로 변환합니다.
+        file_name = f"diary_image_{timestamp}.png" # S3에 저장될 파일 이름
+        image_url = upload_file_to_s3(
+            image_bytes, file_name, S3_BUCKET_NAME,
+            AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+        )
         # Diary 이미지 업데이트
-        diary.img = base64_image
+        diary.img = image_url
         diary.modified_at = datetime.now()
         db.commit()
 
