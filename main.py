@@ -26,61 +26,17 @@ API_HOST = os.getenv('API_HOST', 'https://api.stability.ai')
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
 
+# Automap Base 생성 및 기존 데이터베이스 테이블과의 클래스 매핑 준비
+Base = automap_base()
+Base.prepare(engine, reflect=True)
 
-# 데이터베이스 모델 기본 클래스
-Base = declarative_base()
+# 매핑된 클래스 참조 생성
+Member = Base.classes.member
+Diary = Base.classes.diary
+DiaryInfo = Base.classes.diary_info
 
-# Member 모델 추가
-class Member(Base):
-    __tablename__ = 'member'
-    
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime)
-    modified_at = Column(DateTime)
-    email = Column(String(100), unique=True, index=True)
-    identifier = Column(String(100), unique=True, index=True)
-    member_status = Column(Enum('active', 'block', 'delete')) 
-    nick_name = Column(String(50))
-
-    # Diary 모델과의 관계 정의
-    diaries = relationship("Diary", back_populates="member")
-
-# Diary와 DiaryInfo 모델
-class Diary(Base):
-    __tablename__ = 'diary'
-    
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime)
-    modified_at = Column(DateTime)
-    content = Column(Text)
-    img = Column(Text)
-    is_liked = Column(Boolean)
-    member_id = Column(Integer, ForeignKey('member.id'))  # Member 테이블의 id를 참조하는 외래 키
-    
-    diary_info = relationship("DiaryInfo", back_populates="diary", uselist=False)
-
-class DiaryInfo(Base):
-    __tablename__ = 'diary_info'
-    
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime)
-    modified_at = Column(DateTime)
-    angry = Column(Integer)
-    comfortable = Column(Integer)
-    date = Column(DateTime)
-    experience = Column(String(255))
-    happy = Column(Integer)
-    person = Column(String(255))
-    place = Column(String(255))
-    sad = Column(Integer)
-    diary_id = Column(Integer, ForeignKey('diary.id'))
-
-    diary = relationship("Diary", back_populates="diary_info")
-
-
-
-# 모델을 데이터베이스에 생성 (처음 한 번만 실행)
-Base.metadata.create_all(bind=engine)
+# 세션 생성을 위한 sessionmaker 설정
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # FastAPI 앱 인스턴스 생성
 app = FastAPI()
@@ -208,33 +164,35 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
         current_time = datetime.now()
 
         # Diary 인스턴스 생성 및 저장
-        new_diary = Diary(
+        new_diary = Diary()
+        new_diary.content = content # GPT-3 응답으로부터 생성된 내용
+        new_diary.member_id = request.member_id
+        new_diary.img = base64_image
+        new_diary.is_liked =False
+        new_diary.created_at = current_time # 생성 시간 설정
+        new_diary.modified_at = current_time # 수정 시간 설정
 
-            content=content,  # GPT-3 응답으로부터 생성된 내용
-            img=base64_image,  
-            is_liked=False,  
-            member_id=request.member_id,  # 클라이언트로부터 받은 멤버 ID
-            created_at=current_time,  # 생성 시간 설정
-            modified_at=current_time  # 수정 시간 설정
-        )
         db.add(new_diary)
         db.commit()
         db.refresh(new_diary)
 
         # DiaryInfo 인스턴스 생성 및 저장
-        new_diary_info = DiaryInfo(
-            diary_id=new_diary.id,  # 새로 생성된 Diary의 id 사용
-            angry=request.angry,
-            comfortable=request.comfortable,
-            date=request.date,
-            experience=request.experience,
-            happy=request.happy,
-            person=request.people,
-            place=request.location,
-            sad=request.sad
-        )
+        new_diary_info = DiaryInfo()
+        new_diary_info.diary_id = new_diary.id
+        new_diary_info.created_at = new_diary.created_at
+        new_diary_info.modified_at = new_diary.modified_at
+        new_diary_info.angry= request.angry
+        new_diary_info.comfortable=request.comfortable
+        new_diary_info.date=request.date
+        new_diary_info.experience=request.experience
+        new_diary_info.happy=request.happy
+        new_diary_info.person=request.people
+        new_diary_info.place=request.location
+        new_diary_info.sad=request.sad
+  
         db.add(new_diary_info)
         db.commit()
+        db.refresh(new_diary_info)
         
         return {"content": content, "diary_id": new_diary.id, "image_data": base64_image}
     except Exception as e:
