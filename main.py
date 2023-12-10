@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Form
 from pydantic import BaseModel
+from sqlalchemy.ext.automap import automap_base
 from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import sessionmaker,Session, relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -24,7 +25,7 @@ API_HOST = os.getenv('API_HOST', 'https://api.stability.ai')
 # 데이터베이스 연결 설정
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # 데이터베이스 모델 기본 클래스
 Base = declarative_base()
@@ -109,6 +110,27 @@ class DiaryRequest(BaseModel):
     experience: str
 
 
+# 그림 생성을 위한 요약 생성 함수
+def generate_summary(date, location, people, experience):
+    summary_instruct = [
+        {
+            "role": "system",
+            "content": "Please generate a sentence using the given parameters that can be used as a title for a diary entry. "
+                       "In 50 letters or less than 50 letters "
+                       f"Date: {date}, Location: {location}, People: {people}, Experience: {experience}"
+        }
+    ]
+
+    response = openai.ChatCompletion.create(
+        model="ft:gpt-3.5-turbo-1106:personal::8RpLwK9R",
+        messages=summary_instruct,
+        max_tokens=100,
+        temperature=0.5,
+        top_p=1
+    )
+    summary = response.choices[0].message.content.strip()
+    return summary
+
 
 # 일기 생성 API 엔드포인트
 @app.post("/diary/create")
@@ -142,6 +164,9 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
             presence_penalty=0
         )
         content = response.choices[0].message.content.strip()
+        
+        # 요약 생성
+        summary_content = generate_summary(request.date, request.location, request.people, request.experience)
 
         # Stable Diffusion API 호출 및 이미지 생성
         response = requests.post(
@@ -154,7 +179,7 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
             json={
                 "text_prompts":
                 [{
-                    "text": "With No people," + content, 
+                    "text": "With No people," + summary_content, 
                     "weight": 1
                 },
                 {
@@ -283,6 +308,15 @@ async def regenerate_diary_image(diary_id: int, db: Session = Depends(get_db)):
         diary = db.query(Diary).filter(Diary.id == diary_id).first()
         if not diary:
             raise HTTPException(status_code=404, detail=f"Diary with id {diary_id} not found")
+        
+        # 관련된 DiaryInfo 조회
+        diary_info = db.query(DiaryInfo).filter(DiaryInfo.diary_id == diary_id).first()
+        if not diary_info:
+            raise HTTPException(status_code=404, detail=f"DiaryInfo for diary id {diary_id} not found")
+        
+        # 요약 생성
+        summary_content = generate_summary(diary_info.date, diary_info.place, diary_info.person, diary_info.experience)
+
 
         # Stable Diffusion API 호출 및 이미지 생성
         response = requests.post(
@@ -295,7 +329,7 @@ async def regenerate_diary_image(diary_id: int, db: Session = Depends(get_db)):
             json={
                 "text_prompts":
                 [{
-                    "text": "With No people," + diary.content, 
+                    "text": "With No people," + summary_content, 
                     "weight": 1
                 },
                 {
