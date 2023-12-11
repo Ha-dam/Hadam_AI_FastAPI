@@ -192,6 +192,7 @@ async def create_diary(request: DiaryRequest, db: Session = Depends(get_db)):
         new_diary.member_id = request.member_id
         new_diary.img = image_url
         new_diary.is_liked =False
+        new_diary.date = request.date #diary에 날짜 추가
         new_diary.created_at = current_time # 생성 시간 설정
         new_diary.modified_at = current_time # 수정 시간 설정
 
