@@ -7,3 +7,4 @@ openai==0.28
 requests
 pydantic
 boto3
+deepl
