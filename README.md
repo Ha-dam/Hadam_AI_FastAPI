@@ -44,6 +44,6 @@ After starting the server, the following endpoints are available:
 - **'PUT /diary/recreate/{diary_id}'**: Regenerate the image of an existing diary entry.
 - **'PUT /diary/regenerate-image/{diary_id}'**: Regenerate the image of an existing diary entry.
 
-You can access these endpoints through the auto-generated FastAPI documentation at http://127.0.0.1:8000/docs.
+You can access these endpoints through the auto-generated FastAPI documentation at http://13.209.87.157:8000/docs
 
 Note: Replace [repository URL], [your_database_username], [your_database_password], [your_database_host], [your_database_name], [your_openai_api_key], and [your_stable_diffusion_api_key] with the actual values for your project. Adjust the content as needed based on your project's specific requirements and setup.
