@@ -36,6 +36,8 @@ STABLE_DIFFUSION_API_KEY=[your_stable_diffusion_api_key]
 DEEPL_API_KEY=[your_deepl_api_key]
 ```
 
+Note: Replace [repository URL], [your_database_username], [your_database_password], [your_database_host], [your_database_name], [your_openai_api_key], [your_stable_diffusion_api_key] and [your_deepl_api_key] with the actual values for your project. Adjust the content as needed based on your project's specific requirements and setup.
+
 4. ### Run the Server
 ```uvicorn main:app --reload ```
 
@@ -52,12 +54,13 @@ You can access these endpoints through the auto-generated FastAPI documentation 
 
 <div align=center>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
+  <br>
   <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
   <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapia&logoColor=white">
+
 
 
 </div>
 
 
-
-Note: Replace [repository URL], [your_database_username], [your_database_password], [your_database_host], [your_database_name], [your_openai_api_key], and [your_stable_diffusion_api_key] with the actual values for your project. Adjust the content as needed based on your project's specific requirements and setup.
