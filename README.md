@@ -2,7 +2,7 @@
 Hadam diary generartive server 
 
 ## Overview
-This FastAPI server is designed to create and manage diary entries with the integration of OpenAI's GPT-3 for text generation and Stable Diffusion for image generation. It provides endpoints to create new diary entries, regenerate diary text, and regenerate diary images based on user inputs.
+This FastAPI server is designed to create and manage diary entries with the integration of OpenAI's GPT-3 for text generation and Stable Diffusion for image generation. For better output, we used DeepL API to translate tentative results.  It provides endpoints to create new diary entries, regenerate diary text, and regenerate diary images based on user inputs.
 
 ## Features
 - **Diary Creation**:  Generate diary entries using GPT-3 based on user-provided keywords about their experiences, emotions, and details of the day.
@@ -32,6 +32,7 @@ DB_HOST=[your_database_host]
 DB_NAME=[your_database_name]
 OPENAI_API_KEY=[your_openai_api_key]
 STABLE_DIFFUSION_API_KEY=[your_stable_diffusion_api_key]
+DEEPL_API_KEY=[your_deepl_api_key]
 ```
 
 4. ### Run the Server
