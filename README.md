@@ -47,4 +47,8 @@ After starting the server, the following endpoints are available:
 
 You can access these endpoints through the auto-generated FastAPI documentation at http://13.209.87.157:8000/docs
 
+## Languages and
+<p align="left"> <a href="https://aws.amazon.com" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" alt="aws" width="40" height="40"/> </a> <a href="https://www.python.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/> </a> </p>
+
+
 Note: Replace [repository URL], [your_database_username], [your_database_password], [your_database_host], [your_database_name], [your_openai_api_key], and [your_stable_diffusion_api_key] with the actual values for your project. Adjust the content as needed based on your project's specific requirements and setup.
