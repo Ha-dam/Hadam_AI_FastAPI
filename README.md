@@ -54,12 +54,9 @@ You can access these endpoints through the auto-generated FastAPI documentation 
 
 <div align=center>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
-  <br>
   <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
   <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
-  <br>
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapia&logoColor=white">
-  <br>
   <img src="https://img.shields.io/badge/GPT3-412991?style=for-the-badge&logo=openai&logoColor=white">
   <img src="https://img.shields.io/badge/Deepl-0F2B46?style=for-the-badge&logo=deepl&logoColor=white">
   
