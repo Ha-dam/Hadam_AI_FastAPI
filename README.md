@@ -2,7 +2,8 @@
 Hadam diary generartive server 
 
 ## Overview
-This FastAPI server is designed to create and manage diary entries with the integration of OpenAI's GPT-3 for text generation and Stable Diffusion for image generation. For better output, we used DeepL API to translate tentative results.  It provides endpoints to create new diary entries, regenerate diary text, and regenerate diary images based on user inputs.
+This FastAPI server is designed to create and manage diary entries with the integration of OpenAI's GPT-3 for text generation and Stable Diffusion for image generation. For better output, we used DeepL API to translate tentative results. It provides endpoints to create new diary entries, regenerate diary text, and regenerate diary images based on user inputs.
+Currently, 'Hadam' is running live on Amazon EC2, and the generated picture images are stored in an Amazon S3 bucket.
 
 ## Features
 - **Diary Creation**:  Generate diary entries using GPT-3 based on user-provided keywords about their experiences, emotions, and details of the day.
@@ -51,7 +52,6 @@ You can access these endpoints through the auto-generated FastAPI documentation 
 
 <div align=center>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
-  <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
   <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
   <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
 
