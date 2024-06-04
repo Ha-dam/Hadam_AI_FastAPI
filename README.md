@@ -49,7 +49,7 @@ You can access these endpoints through the auto-generated FastAPI documentation 
 
 ## Language and Tools
 
-- <img src="https://img.shields.io/badge/GPT-3-#412991?style=flat&logo=openai&logoColor=white"/>
+<img src="https://img.shields.io/badge/GPT-3-#412991?style=flat&logo=openai&logoColor=white"/>
 
 
 
