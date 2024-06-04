@@ -60,9 +60,9 @@ You can access these endpoints through the auto-generated FastAPI documentation 
   <img src="https://img.shields.io/badge/GPT3-412991?style=for-the-badge&logo=openai&logoColor=white">
   <img src="https://img.shields.io/badge/Deepl-0F2B46?style=for-the-badge&logo=deepl&logoColor=white">
   
-
-
-
 </div>
+
+## Author
+
 
 
