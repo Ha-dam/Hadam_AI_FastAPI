@@ -57,14 +57,14 @@ After starting the server, the following endpoints are available:
 Access the auto-generated FastAPI documentation [here](http://13.209.87.157:8000/docs).
 
 ## Language and Tools
-<div align="left">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
-  <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
-  <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white">
-  <img src="https://img.shields.io/badge/GPT3-412991?style=for-the-badge&logo=openai&logoColor=white">
-  <img src="https://img.shields.io/badge/DeepL-0F2B46?style=for-the-badge&logo=deepl&logoColor=white">
-</div>
+
+| Role                    | What we Used                                                                                                   |
+|-----------------------|------------------------------------------------------------------------------------------------------|
+| **Framework**         | <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"> |
+| **Storage Service**   | <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white"> |
+| **Hosting Service**   | <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white"> |
+| **Programming Language** | <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white"> |
+| **API & Translation**  | <img src="https://img.shields.io/badge/GPT3-412991?style=for-the-badge&logo=openai&logoColor=white"> <img src="https://img.shields.io/badge/DeepL-0F2B46?style=for-the-badge&logo=deepl&logoColor=white"> <img src="https://img.shields.io/badge/Stability.ai-222222?style=for-the-badge&logo=stability&logoColor=white"> |
 
 ## Author
 
