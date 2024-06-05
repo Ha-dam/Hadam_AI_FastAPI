@@ -54,7 +54,7 @@ After starting the server, the following endpoints are available:
 - **PUT `/diary/recreate/{diary_id}`**: Regenerate the text of an existing diary entry.
 - **PUT `/diary/regenerate-image/{diary_id}`**: Regenerate the image of an existing diary entry.
 
-Access the auto-generated FastAPI documentation [here](http://13.209.87.157:8000/docs).
+You can access the auto-generated FastAPI documentation on your local server at `http://127.0.0.1:8000/docs` after starting the server.
 
 ## Language and Tools
 
