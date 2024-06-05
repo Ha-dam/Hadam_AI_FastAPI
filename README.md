@@ -68,7 +68,13 @@ You can access the auto-generated FastAPI documentation on your local server at 
 
 ## Author
 
+### Minwoo Kwon
+- **Email**: [422mukgui@gachon.ac.kr](mailto:422mukgui@gachon.ac.kr)
+- **GitHub**: [MINUUUUUUUUUUUU](https://github.com/MINUUUUUUUUUUUU)
 
+### Hyoyoung Shin
+- **Email**: [hyashin1998@gmail.com](mailto:hyashin1998@gmail.com)
+- **GitHub**: [HyoYoungShin](https://github.com/HyoYoungShin)
 
 
 
