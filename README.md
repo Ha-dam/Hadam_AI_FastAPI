@@ -57,7 +57,7 @@ After starting the server, the following endpoints are available:
 Access the auto-generated FastAPI documentation [here](http://13.209.87.157:8000/docs).
 
 ## Language and Tools
-<div align="center">
+<div align="left">
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
   <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
   <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
@@ -67,7 +67,7 @@ Access the auto-generated FastAPI documentation [here](http://13.209.87.157:8000
 </div>
 
 ## Author
-*Your Name*
+
 
 
 
